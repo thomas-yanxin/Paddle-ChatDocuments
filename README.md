@@ -37,3 +37,12 @@ python chat_documents.py
 ```bash
 python app.py
 ```
+
+```
+@misc{=paddlenlp,
+    title={PaddleNLP: An Easy-to-use and High Performance NLP Library},
+    author={PaddleNLP Contributors},
+    howpublished = {\url{https://github.com/PaddlePaddle/PaddleNLP}},
+    year={2021}
+}
+```
