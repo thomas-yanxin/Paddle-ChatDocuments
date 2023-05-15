@@ -147,14 +147,18 @@ class ChatGLM_documents():
             document_store.update_embeddings(retriever)
 
         return retriever
-
-
-    def chatglm_bot(self, query, history=[], search_engine="faiss"):
-
-        if search_engine == "milvus":
+    
+    def get_retriever(self):
+        if self.search_engine == "milvus":
             retriever = self.get_milvus_retriever(self.device)
         else:
             retriever = self.get_faiss_retriever(self.device)
+        return retriever
+        
+
+    def chatglm_bot(self, query, retriever, history=[], top_k=5, max_length=10000, **kwargs):
+
+
         ranker = ErnieRanker(model_name_or_path="rocketqa-zh-dureader-cross-encoder", use_gpu=self.device)
 
         self.pipe.add_node(component=retriever, name="Retriever", inputs=["Query"])
