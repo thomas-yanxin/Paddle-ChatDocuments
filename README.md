@@ -11,9 +11,8 @@
 ```bash
 git clone https://github.com/PaddlePaddle/PaddleNLP.git
 
-## 国内用户可git此镜像
-
-git clone https://openi.pcl.ac.cn/PaddlePaddle/PaddleNLP.git
+#国内用户可git此镜像
+# git clone https://openi.pcl.ac.cn/PaddlePaddle/PaddleNLP.git
 ```
 
 2. 安装依赖
