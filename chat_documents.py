@@ -16,8 +16,8 @@
 import os
 
 from pipelines.document_stores import FAISSDocumentStore, MilvusDocumentStore
-from pipelines.nodes import (ChatGLMBot, DensePassageRetriever, PromptTemplate,
-                             TruncatedConversationHistory)
+from pipelines.nodes import (ChatGLMBot, DensePassageRetriever, ErnieRanker,
+                             PromptTemplate, TruncatedConversationHistory)
 from pipelines.pipelines import Pipeline
 from pipelines.utils import convert_files_to_dicts
 
@@ -38,6 +38,7 @@ class ChatGLM_documents():
     port: str = '8530'
     embed_title: bool = False
     model_type: str = 'ernie'
+    
     chatglm = ChatGLMBot()
     pipe = Pipeline()
 
@@ -154,8 +155,11 @@ class ChatGLM_documents():
             retriever = self.get_milvus_retriever(self.device)
         else:
             retriever = self.get_faiss_retriever(self.device)
-        
+        ranker = ErnieRanker(model_name_or_path="rocketqa-zh-dureader-cross-encoder", use_gpu=self.device)
+
         self.pipe.add_node(component=retriever, name="Retriever", inputs=["Query"])
+        self.pipe.add_node(component=ranker, name="Ranker", inputs=["Retriever"])
+        
         self.pipe.add_node(component=PromptTemplate("背景：{documents} 问题：{query}"), name="Template", inputs=["Retriever"])
         self.pipe.add_node(component=TruncatedConversationHistory(max_length=64), name="TruncateHistory", inputs=["Template"])
         self.pipe.add_node(component=self.chatglm, name="ChatGLMBot", inputs=["TruncateHistory"])
