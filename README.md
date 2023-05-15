@@ -1,6 +1,6 @@
-# ChatDocuments with ChatGLM in Paddle
+# ChatDocuments with Paddle
 
-本项目聚焦于PaddlePaddle生态, 利用飞桨生态内的技术实现 `LangChain+ChatGLM` 的效果, 避免依赖的过度繁杂冗余.
+本项目聚焦于PaddlePaddle生态, 利用飞桨生态内的技术实现 `LangChain+ChatGLM: 基于本地知识库实现自动问答` 的效果, 避免依赖的过度繁杂冗余.
 
 ## 🚀 使用方式
 
