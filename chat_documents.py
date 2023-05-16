@@ -148,14 +148,6 @@ class ChatGLM_documents():
 
         return retriever
     
-    def get_retriever(self):
-        if self.search_engine == "milvus":
-            retriever = self.get_milvus_retriever(self.device)
-        else:
-            retriever = self.get_faiss_retriever(self.device)
-        return retriever
-        
-
     def chatglm_bot(self, query, retriever, history=[], top_k=5, max_length=10000, **kwargs):
 
 
@@ -179,5 +171,7 @@ class ChatGLM_documents():
 
 
 if __name__ == "__main__":
+    
     chatglm_documents = ChatGLM_documents()
-    chatglm_documents.chatglm_bot('你好',)
+    retriever = chatglm_documents.get_faiss_retriever(use_gpu=True)
+    chatglm_documents.chatglm_bot('你好',retriever=retriever)
