@@ -5,7 +5,7 @@ import gradio as gr
 from chat_documents import ChatGLM_documents
 
 chatglm_documents = ChatGLM_documents()
-
+retriever = chatglm_documents.get_faiss_retriever(use_gpu=True)
 def clear_session():
     return '', None
 
@@ -14,9 +14,8 @@ def predict(input, history=None):
 
     if history is None:
         history = []
-    chatglm_documents.chatglm_bot_tutorial(input, history)
 
-    history = chatglm_documents.chatglm_bot_tutorial(input, history)
+    history = chatglm_documents.chatglm_bot(input,retriever=retriever)
 
     return '', history, history
 
@@ -44,4 +43,4 @@ with block as demo:
                         outputs=[chatbot, state],
                         queue=False)
 
-demo.queue().launch(height=800, share=False)
+demo.queue().launch(height=800, share=True)

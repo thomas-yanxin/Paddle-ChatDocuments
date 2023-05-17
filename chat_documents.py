@@ -62,6 +62,7 @@ class ChatGLM_documents():
         else:
             doc_dir = "./data/"
             dicts = convert_files_to_dicts(dir_path=doc_dir, split_paragraphs=True, encoding="utf-8")
+            print(dicts)
 
             if os.path.exists(self.index_name):
                 os.remove(self.index_name)
@@ -89,7 +90,9 @@ class ChatGLM_documents():
 
             # save index
             document_store.save(self.index_name)
-        return retriever
+        ranker = ErnieRanker(model_name_or_path="rocketqa-zh-dureader-cross-encoder", use_gpu=self.device)
+
+        return retriever, ranker
 
 
     def get_milvus_retriever(self, use_gpu):
@@ -145,13 +148,12 @@ class ChatGLM_documents():
             document_store.write_documents(dicts)
             # update Embedding
             document_store.update_embeddings(retriever)
-
-        return retriever
-    
-    def chatglm_bot(self, query, retriever, history=[], top_k=5, max_length=10000, **kwargs):
-
-
         ranker = ErnieRanker(model_name_or_path="rocketqa-zh-dureader-cross-encoder", use_gpu=self.device)
+
+        return retriever, ranker
+    
+
+    def chatglm_bot(self, query, retriever, ranker, history=[], top_k=5, max_length=10000, **kwargs):
 
         self.pipe.add_node(component=retriever, name="Retriever", inputs=["Query"])
         self.pipe.add_node(component=ranker, name="Ranker", inputs=["Retriever"])
@@ -171,7 +173,6 @@ class ChatGLM_documents():
 
 
 if __name__ == "__main__":
-    
     chatglm_documents = ChatGLM_documents()
-    retriever = chatglm_documents.get_faiss_retriever(use_gpu=True)
-    chatglm_documents.chatglm_bot('你好',retriever=retriever)
+    retriever, ranker= chatglm_documents.get_faiss_retriever(use_gpu=True)
+    chatglm_documents.chatglm_bot('chatglm-6b的局限性在哪里？如何改进？',retriever=retriever, ranker=ranker)
