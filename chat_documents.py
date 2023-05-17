@@ -270,7 +270,7 @@ class ChatGLM_documents():
                                    })
         print("user: {}".format(query))
         print("assistant: {}".format(prediction["result"]))
-        history = prediction["history"]
+        history.append((query, prediction["result"]))
         return history
 
 
