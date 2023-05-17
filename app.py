@@ -5,7 +5,8 @@ import gradio as gr
 from chat_documents import ChatGLM_documents
 
 chatglm_documents = ChatGLM_documents()
-retriever = chatglm_documents.get_faiss_retriever(use_gpu=True)
+
+retriever= chatglm_documents.get_faiss_retriever(use_gpu=True, filepaths="/home/aistudio/docs", chunk_size=10000)
 def clear_session():
     return '', None
 
@@ -15,7 +16,8 @@ def predict(input, history=None):
     if history is None:
         history = []
 
-    history = chatglm_documents.chatglm_bot(input,retriever=retriever)
+    history = chatglm_documents.chatglm_bot(input,
+                                  retriever=retriever)
 
     return '', history, history
 
@@ -23,7 +25,7 @@ def predict(input, history=None):
 block = gr.Blocks()
 
 with block as demo:
-    gr.Markdown("""<h1><center>Chat Documents</center></h1>
+    gr.Markdown("""<h1><center>Paddle-ChatDocuments</center></h1>
     """)
     chatbot = gr.Chatbot(label='ChatGLM-6B')
     message = gr.Textbox()
