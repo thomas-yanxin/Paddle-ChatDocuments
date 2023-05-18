@@ -39,6 +39,7 @@ class ChatGLM_documents():
     embedding_dim: int = 768
     embed_title: bool = False
     tgt_length: int = 512
+    model_type: str = 'ernie_search'
 
     chatglm = ChatGLMBot(tgt_length=tgt_length)
     pipe = Pipeline()
