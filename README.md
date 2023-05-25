@@ -2,45 +2,13 @@
 
 本项目聚焦于PaddlePaddle生态, 利用飞桨生态内的技术实现 `LangChain+ChatGLM: 基于本地知识库实现自动问答` 的效果, 避免依赖的过度繁杂冗余.
 
+## 🔊技术原理
+
+多路召回是指采用不同的策略、特征或者简单的模型, 分别召回一部分候选集合, 然后把这些候选集混合在一起供后续的排序模型进行重排, 也可以定制自己的重排序的规则等等. 本项目使用关键字和语义检索两路召回的检索系统, 系统的架构如下, 用户输入的Query会分别通过关键字召回BMRetriever(Okapi BM 25算法, Elasticsearch默认使用的相关度评分算法, 是基于词频和文档频率和文档长度相关性来计算相关度), 语义向量检索召回DenseRetriever(使用RocketQA抽取向量, 然后比较向量之间相似度)后得到候选集, 然后通过JoinResults进行结果聚合, 最后通过通用的Ranker模块得到重排序的结果返回给用户.
+
 ## 🚀 使用方式
 
-1. 环境准备
-
-本项目需要依赖PaddlePaddle Develop版本, 安装教程[见此链接](https://www.paddlepaddle.org.cn/)
-
-```bash
-git clone https://github.com/PaddlePaddle/PaddleNLP.git
-
-#国内用户可git此镜像
-# git clone https://openi.pcl.ac.cn/PaddlePaddle/PaddleNLP.git
-```
-
-2. 安装依赖
-
-```bash
-pip install -e ./PaddleNLP/.
-```
-
-```bash
-pip install -e ./PaddleNLP/pipeline/.
-```
-
-3. 执行命令
-
-```bash
-python chat_documents.py
-```
-
-```
-INFO - pipelines.nodes.llm.chatglm -  背景：知识库文件放在此文件目录中 问题：你好
-user: 你好
-assistant: ['你好!请问有什么需要帮助的吗?\n\n如果你需要查询知识库文件的内容,可以使用搜索引擎或者文件管理器等工具来查找它们。例如,在搜索引擎中输入“知识库文件 目录”或“知识库文件在此目录中的内容”,就可以找到相关的搜索结果。\n\n如果你需要对知识库文件进行修改或者添加内容,建议先备份好原始文件,然后根据具体的操作需求进行修改。一些常见的知识库文件格式包括CSV、JSON和XML等,你可以选择合适的格式来存储和管理知识库数据。']
-[('你好', '你好!请问有什么需要帮助的吗?\n\n如果你需要查询知识库文件的内容,可以使用搜索引擎或者文件管理器等工具来查找它们。例如,在搜索引擎中输入“知识库文件 目录”或“知识库文件在此目录中的内容”,就可以找到相关的搜索结果。\n\n如果你需要对知识库文件进行修改或者添加内容,建议先备份好原始文件,然后根据具体的操作需求进行修改。一些常见的知识库文件格式包括CSV、JSON和XML等,你可以选择合适的格式来存储和管理知识库数据。')]
-```
-
-```bash
-python app.py
-```
+详情请见: [部署文档](./docs/deploy.md)
 
 ## 💪 更新日志
 

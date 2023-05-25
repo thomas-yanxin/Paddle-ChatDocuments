@@ -3,7 +3,7 @@ import shutil
 
 import gradio as gr
 
-from chat_documents import ChatGLM_documents
+from chat_documents_multi_recall import ChatGLM_documents
 
 chatglm_documents = ChatGLM_documents()
 
@@ -19,22 +19,23 @@ def predict(input, file_obj_list, chunk_size=10000, history=None):
     print(file_obj_list)
     if not os.path.exists("./docs"):
         os.makedirs("./docs")
-    else:
-        shutil.rmtree("./docs")
-        os.makedirs("./docs")
+
 
     for file_obj in file_obj_list:
         fpath,fname=os.path.split(file_obj.name)             # 分离文件名和路径
         print(fpath,fname)
         shutil.move(file_obj.name, "./docs/" + fname)
     
-    retriever= chatglm_documents.get_faiss_retriever(use_gpu=True, filepaths="./docs", chunk_size=chunk_size)
+    dpr_retriever, bm_retriever = chatglm_documents.get_es_retriever(
+        use_gpu=True,
+        filepaths="./docs/",
+        chunk_size=1000)
 
     history = chatglm_documents.chatglm_bot(input,
-                                  retriever=retriever)
+                                  dpr_retriever=dpr_retriever,
+                                  bm_retriever=bm_retriever)
 
     return '', history, history
-
 
 block = gr.Blocks()
 
@@ -65,4 +66,4 @@ with block as demo:
                         outputs=[chatbot, state],
                         queue=False)
 
-demo.queue().launch(height=800, share=True)
+demo.queue().launch(height=800, share=False)

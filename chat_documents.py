@@ -1,17 +1,3 @@
-# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import glob
 import os
 
@@ -42,11 +28,8 @@ class ChatGLM_documents():
     model_type: str = 'ernie_search'
 
     chatglm = ChatGLMBot(tgt_length=tgt_length)
-    pipe = Pipeline()
-    ranker = ErnieRanker(
-            model_name_or_path=ranker_model,
-            use_gpu=device,
-        )
+    
+    
 
     def get_faiss_retriever(self, use_gpu, filepaths, chunk_size):
         faiss_document_store = "faiss_document_store.db"
@@ -231,25 +214,35 @@ class ChatGLM_documents():
                     retriever,
                     history=[],
                     top_k=10,
-                    max_length=64,
+                    max_length=128,
                     **kwargs):
+        pipe = Pipeline()
+        ranker = ErnieRanker(
+            model_name_or_path=self.ranker_model,
+            use_gpu=self.device,
+        )
 
-        self.pipe.add_node(component=retriever,
+        pipe.add_node(component=retriever,
                            name="Retriever",
                            inputs=["Query"])
-        self.pipe.add_node(component=self.ranker,
+        pipe.add_node(component=self.ranker,
                            name="Ranker",
                            inputs=["Retriever"])
 
-        self.pipe.add_node(
-            component=PromptTemplate("背景：{documents} 问题：{query}"),
+        pipe.add_node(
+            component=PromptTemplate("""基于以下已知信息，请简洁并专业地回答用户的问题。
+                如果无法从中得到答案，请说 "根据已知信息无法回答该问题" 或 "没有提供足够的相关信息"。不允许在答案中添加编造成分。另外，答案请使用中文。
+
+                已知内容：{documents} 
+                
+                问题：{query}"""),
             name="Template",
             inputs=["Ranker"])
-        self.pipe.add_node(
+        pipe.add_node(
             component=TruncatedConversationHistory(max_length=max_length),
             name="TruncateHistory",
             inputs=["Template"])
-        self.pipe.add_node(component=self.chatglm,
+        pipe.add_node(component=self.chatglm,
                            name="ChatGLMBot",
                            inputs=["TruncateHistory"])
 
@@ -260,7 +253,7 @@ class ChatGLM_documents():
         # self.pipe.add_node(component=self.chatglm, name="ChatGLMBot", inputs=["TruncateHistory"])
         history = []
 
-        prediction = self.pipe.run(query=query,
+        prediction = pipe.run(query=query,
                                    params={
                                        "Retriever": {
                                            "top_k": top_k
@@ -277,7 +270,7 @@ class ChatGLM_documents():
 
 if __name__ == "__main__":
     chatglm_documents = ChatGLM_documents()
-    retriever= chatglm_documents.get_faiss_retriever(use_gpu=True, filepaths="/home/aistudio/docs", chunk_size=10000)
+    retriever= chatglm_documents.get_faiss_retriever(use_gpu=True, filepaths="/home/aistudio/docs", chunk_size=1000)
 
 
     chatglm_documents.chatglm_bot('chatglm-6b的局限性在哪里？如何改进？',
