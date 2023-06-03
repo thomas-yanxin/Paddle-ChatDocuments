@@ -29,7 +29,7 @@ python setup.py
 
 ### 启动ES服务
 
-1. 参考官方文档下载安装 [elasticsearch-8.3.2](https://www.elastic.co/cn/downloads/elasticsearc)并解压.
+1. 参考官方文档下载安装 [elasticsearch-8.3.2](https://www.elastic.co/cn/downloads/elasticsearch)并解压.
 2. 启动ES服务
 先修改 `config/elasticsearch.yml` 的配置:
 
